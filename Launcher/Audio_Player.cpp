@@ -33,6 +33,7 @@ int  Audio_Player::RecordCallback(const void *input_buffer, void  *output_buffer
 
     //qDebug()<<"writeIndex"<<audioCache->writeIndex<<"readIndex"<<audioCache->readIndex;
     int  out_size = av_samples_get_buffer_size(NULL, audioCache->channelCount, frames_per_buffer, audioCache->sample_fmt,0);
+    //qDebug()<<"rr out_size"<<out_size;
     bool getData = false;
     if(audioCache->writeIndex > audioCache->readIndex)
     {
@@ -120,7 +121,7 @@ void Audio_Player::run()
 
     //目的输出参数
     this->audioCache.channelCount = 1;
-    this->audioCache.sample_rate = outputDeviceInfo->defaultSampleRate;
+    this->audioCache.sample_rate = outputDeviceInfo->defaultSampleRate;// 48000;//采样率最好和音频文件的一致
     this->audioCache.sample_fmt = AVSampleFormat::AV_SAMPLE_FMT_FLT;//AV_SAMPLE_FMT_S16;//    AV_SAMPLE_FMT_FLT;
 
     qDebug()<<"sample_rate"<<this->audioCache.sample_rate;
@@ -137,7 +138,7 @@ void Audio_Player::run()
         outputParameters.device = outputDeviceIndex;
         outputParameters.channelCount = this->audioCache.channelCount;
         outputParameters.sampleFormat = paFloat32;// paFloat32;
-        outputParameters.suggestedLatency = outputDeviceInfo->defaultLowOutputLatency;
+        outputParameters.suggestedLatency =outputDeviceInfo->defaultHighOutputLatency;// outputDeviceInfo->defaultLowOutputLatency;
         outputParameters.hostApiSpecificStreamInfo = NULL;
 
         int framesPerBuffer= this->pCodecCtx->frame_size;//this->pCodecCtx->frame_size;// av_samples_get_buffer_size(NULL, this->channelCount, this->pCodecCtx->frame_size, this->sample_fmt,0);
@@ -148,8 +149,11 @@ void Audio_Player::run()
         }
 
         //framesPerBuffer = 800;// 256;
-        //paClipOff  paFramesPerBufferUnspecified
-        err = Pa_OpenStream(&out_stream,NULL, &outputParameters, this->audioCache.sample_rate , framesPerBuffer,paClipOff , RecordCallback, &this->audioCache);
+        //paFramesPerBufferUnspecified
+        //paClipOff
+        //paDitherOff有效降低播放噪音
+
+        err = Pa_OpenStream(&out_stream,NULL, &outputParameters, this->audioCache.sample_rate , framesPerBuffer,paDitherOff , RecordCallback, &this->audioCache);
         if (err != paNoError) {
 
         }
@@ -210,7 +214,7 @@ void Audio_Player::run()
                 }
             }
 
-            msleep(1);
+            //msleep(1);
 
         }
 
