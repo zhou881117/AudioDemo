@@ -33,12 +33,14 @@ int  Audio_Player::RecordCallback(const void *input_buffer, void  *output_buffer
 
     //qDebug()<<"writeIndex"<<audioCache->writeIndex<<"readIndex"<<audioCache->readIndex;
     int  out_size = av_samples_get_buffer_size(NULL, audioCache->channelCount, frames_per_buffer, audioCache->sample_fmt,0);
+    bool getData = false;
     if(audioCache->writeIndex > audioCache->readIndex)
     {
         if(audioCache->writeIndex >= audioCache->readIndex+out_size)
         {
             memcpy(output_buffer,audioCache->buffer+audioCache->readIndex ,out_size);
             audioCache->readIndex += out_size;
+            getData=true;
         }
     }
     else if(audioCache->writeIndex < audioCache->readIndex)
@@ -49,6 +51,7 @@ int  Audio_Player::RecordCallback(const void *input_buffer, void  *output_buffer
             {
                 memcpy(output_buffer,audioCache->buffer + audioCache->readIndex ,out_size);
                 audioCache->readIndex += out_size;
+                 getData=true;
             }
             else
             {
@@ -62,10 +65,15 @@ int  Audio_Player::RecordCallback(const void *input_buffer, void  *output_buffer
                 }
                 memcpy((unsigned char*)output_buffer +len1,audioCache->buffer ,len2);
                 audioCache->readIndex = len2;
+                getData = true;
             }
         }
     }
 
+    if(!getData)
+    {
+        memset(output_buffer,0,out_size);//没有输入时赋值0
+    }
     return audioCache->isRunning ? paContinue: paComplete;
 }
 
@@ -115,6 +123,8 @@ void Audio_Player::run()
     this->audioCache.sample_rate = outputDeviceInfo->defaultSampleRate;
     this->audioCache.sample_fmt = AVSampleFormat::AV_SAMPLE_FMT_FLT;//AV_SAMPLE_FMT_S16;//    AV_SAMPLE_FMT_FLT;
 
+    qDebug()<<"sample_rate"<<this->audioCache.sample_rate;
+
     this->audioCache.writeIndex = 0;
     this->audioCache.readIndex = 0;
 
@@ -126,10 +136,9 @@ void Audio_Player::run()
         PaStreamParameters outputParameters;
         outputParameters.device = outputDeviceIndex;
         outputParameters.channelCount = this->audioCache.channelCount;
-        outputParameters.sampleFormat = paFloat32;
+        outputParameters.sampleFormat = paFloat32;// paFloat32;
         outputParameters.suggestedLatency = outputDeviceInfo->defaultLowOutputLatency;
         outputParameters.hostApiSpecificStreamInfo = NULL;
-
 
         int framesPerBuffer= this->pCodecCtx->frame_size;//this->pCodecCtx->frame_size;// av_samples_get_buffer_size(NULL, this->channelCount, this->pCodecCtx->frame_size, this->sample_fmt,0);
         qDebug()<< "framesPerBuffer"<< framesPerBuffer;
@@ -137,8 +146,10 @@ void Audio_Player::run()
         {
             framesPerBuffer = 1024;
         }
+
         //framesPerBuffer = 800;// 256;
-        err = Pa_OpenStream(&out_stream,NULL, &outputParameters, outputDeviceInfo->defaultSampleRate, framesPerBuffer, paFramesPerBufferUnspecified, RecordCallback, &this->audioCache);
+        //paClipOff  paFramesPerBufferUnspecified
+        err = Pa_OpenStream(&out_stream,NULL, &outputParameters, this->audioCache.sample_rate , framesPerBuffer,paClipOff , RecordCallback, &this->audioCache);
         if (err != paNoError) {
 
         }
