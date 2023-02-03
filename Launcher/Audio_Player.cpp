@@ -106,10 +106,10 @@ void Audio_Player::run()
     {
         const  PaDeviceInfo* paDeviceInfo = Pa_GetDeviceInfo(i);
         qDebug()<<"input count"<<paDeviceInfo->maxInputChannels
-               <<"output count"<<paDeviceInfo->maxOutputChannels
-              <<"hostApi"<<paDeviceInfo->hostApi
-             <<"apiType"<<Pa_GetHostApiInfo(paDeviceInfo->hostApi)->type
-            <<"name"<<paDeviceInfo->name<<endl;		//打印设备名
+                <<"output count"<<paDeviceInfo->maxOutputChannels
+                <<"hostApi"<<paDeviceInfo->hostApi
+                <<"apiType"<<Pa_GetHostApiInfo(paDeviceInfo->hostApi)->type
+                <<"name"<<paDeviceInfo->name<<endl;		//打印设备名
         if(outputDeviceIndex == -1 && paDeviceInfo->maxOutputChannels > 0)
         {
             outputDeviceIndex = i;
@@ -121,7 +121,7 @@ void Audio_Player::run()
 
     //目的输出参数
     this->audioCache.channelCount = 1;
-    this->audioCache.sample_rate = outputDeviceInfo->defaultSampleRate;// 48000;//采样率最好和音频文件的一致
+    this->audioCache.sample_rate = outputDeviceInfo->defaultSampleRate;//32000;// outputDeviceInfo->defaultSampleRate;// 48000;//采样率最好和音频文件的一致
     this->audioCache.sample_fmt = AVSampleFormat::AV_SAMPLE_FMT_FLT;//AV_SAMPLE_FMT_S16;//    AV_SAMPLE_FMT_FLT;
 
     qDebug()<<"sample_rate"<<this->audioCache.sample_rate;
@@ -129,17 +129,19 @@ void Audio_Player::run()
     this->audioCache.writeIndex = 0;
     this->audioCache.readIndex = 0;
 
+
+    outputParameters.device = outputDeviceIndex;
+    outputParameters.channelCount = this->audioCache.channelCount;
+    outputParameters.sampleFormat = paFloat32;// paFloat32;
+    outputParameters.suggestedLatency =outputDeviceInfo->defaultLowOutputLatency;// outputDeviceInfo->defaultLowOutputLatency;
+    outputParameters.hostApiSpecificStreamInfo = NULL;
+
     //打开音频文件
     bool res = this->Open(this->filePath.toUtf8().data());
 
     if(res)
     {
-        PaStreamParameters outputParameters;
-        outputParameters.device = outputDeviceIndex;
-        outputParameters.channelCount = this->audioCache.channelCount;
-        outputParameters.sampleFormat = paFloat32;// paFloat32;
-        outputParameters.suggestedLatency =outputDeviceInfo->defaultHighOutputLatency;// outputDeviceInfo->defaultLowOutputLatency;
-        outputParameters.hostApiSpecificStreamInfo = NULL;
+
 
         int framesPerBuffer= this->pCodecCtx->frame_size;//this->pCodecCtx->frame_size;// av_samples_get_buffer_size(NULL, this->channelCount, this->pCodecCtx->frame_size, this->sample_fmt,0);
         qDebug()<< "framesPerBuffer"<< framesPerBuffer;
@@ -152,7 +154,7 @@ void Audio_Player::run()
         //paFramesPerBufferUnspecified
         //paClipOff
         //paDitherOff有效降低播放噪音
-
+        PaStream *out_stream = nullptr;
         err = Pa_OpenStream(&out_stream,NULL, &outputParameters, this->audioCache.sample_rate , framesPerBuffer,paDitherOff , RecordCallback, &this->audioCache);
         if (err != paNoError) {
 
@@ -218,9 +220,9 @@ void Audio_Player::run()
 
         }
 
-        Pa_StopStream(this->out_stream);
-        Pa_AbortStream(this->out_stream);
-        Pa_CloseStream(this->out_stream);
+        Pa_StopStream(out_stream);
+        Pa_AbortStream(out_stream);
+        Pa_CloseStream(out_stream);
         Pa_Terminate();
     }
     else
@@ -279,8 +281,16 @@ bool Audio_Player::Open(char *filePath)
     }
 
     //av_get_bytes_per_sample(pCodecCtx->sample_fmt) 每一个采样数据的byte长度
-    qDebug()<< "frame_size"<< this->pCodecCtx->frame_size;//有些有，有些又没有
+    qDebug()<<"frame_size"<<this->pCodecCtx->frame_size;//有些有，有些又没有
+    qDebug()<<"sample_rate"<<pCodecCtx->sample_rate;
 
+
+    //设备支持音频文件的采样率
+    PaError err = Pa_IsFormatSupported(NULL,&outputParameters,pCodecCtx->sample_rate);
+    if( err == paFormatIsSupported )
+    {
+       this->audioCache.sample_rate = pCodecCtx->sample_rate;
+    }
 
     this->packet = av_packet_alloc();// (AVPacket *)av_malloc(sizeof(AVPacket));
     //this->packet->size=1000;

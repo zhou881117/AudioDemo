@@ -68,10 +68,11 @@ private:
     //QAudioOutput *audioOutput = nullptr;
     //QIODevice *ioDevice = nullptr;
 
-    PaStream *out_stream = nullptr;
-    QString filePath;
 
+    QString filePath;
     AudioCache   audioCache;
+    PaStreamParameters outputParameters;
+
 private:
 
     AVFormatContext	*pFormatCtx = NULL;
