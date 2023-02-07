@@ -1,4 +1,4 @@
-#ifndef AUDIO_PLAYER_H
+﻿#ifndef AUDIO_PLAYER_H
 #define AUDIO_PLAYER_H
 
 extern "C" {
@@ -18,6 +18,10 @@ extern "C" {
 
 extern "C" {
   #include "portaudio.h"
+}
+
+extern "C" {
+   #include "sherpa_ncnn_shell.h"
 }
 
 #include <QtCore>

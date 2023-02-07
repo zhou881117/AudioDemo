@@ -1,8 +1,10 @@
-#include "Audio_Player.h"
+﻿#include "Audio_Player.h"
 
 Audio_Player::Audio_Player(QObject *parent, QString filePath): QThread(parent)
 {
     this->filePath=filePath;
+
+    qDebug()<<sherpa_add(2,3);
 }
 
 Audio_Player::~Audio_Player()
@@ -21,7 +23,6 @@ void Audio_Player::tryStop()
     this->quit();
     this->wait();
 }
-
 
 
 int  Audio_Player::RecordCallback(const void *input_buffer, void  *output_buffer,
@@ -216,10 +217,10 @@ void Audio_Player::run()
                 }
             }
 
-            //msleep(1);
-
+            msleep(1);
         }
 
+        qDebug()<<"stop 1";
         Pa_StopStream(out_stream);
         Pa_AbortStream(out_stream);
         Pa_CloseStream(out_stream);

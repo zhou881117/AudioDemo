@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -16,6 +16,15 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+public slots:
+    void handleMessage(const QString& message)
+    {
+        if(message.size()>0)
+        {
+            this->showNormal();
+        }
+    }
 
 private slots:
     void on_selectFileButton_clicked();
