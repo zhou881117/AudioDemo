@@ -37,5 +37,6 @@ private:
     Ui::MainWindow *ui;
 
     Audio_Player *audio_Player = nullptr;
+    Sherpa_Helper *sherpa_Helper = nullptr;
 };
 #endif // MAINWINDOW_H

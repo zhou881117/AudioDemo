@@ -25,10 +25,9 @@ DLL_EXPORT char *sherpa_init_feature();
 
 DLL_EXPORT void sherpa_release_feature(char *_feature_extractor);
 
-DLL_EXPORT void sherpa_go(char *_tokens, char *_encoder_param,
-                         char *_encoder_bin,
+DLL_EXPORT void sherpa_go(char *_tokens, char *_encoder_param,  char *_encoder_bin,
                char *_decoder_param, char *_decoder_bin, char *_joiner_param,
-               char *_joiner_bin, char *_feature_extractor, void *_callback);
+               char *_joiner_bin, char *_feature_extractor, void *_callback,bool &runing);
 
 DLL_EXPORT void sherpa_putdata(char *_feature_extractor, float sampling_rate,
                     const float *waveform, int frames_per_buffer);

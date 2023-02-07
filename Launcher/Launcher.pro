@@ -14,12 +14,14 @@ DESTDIR = $$PWD/../bin
 SOURCES += \
     AudioCache.cpp \
     Audio_Player.cpp \
+    Sherpa_Helper.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     AudioCache.h \
     Audio_Player.h \
+    Sherpa_Helper.h \
     mainwindow.h
 
 FORMS += \

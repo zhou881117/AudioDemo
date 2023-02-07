@@ -20,9 +20,6 @@ extern "C" {
   #include "portaudio.h"
 }
 
-extern "C" {
-   #include "sherpa_ncnn_shell.h"
-}
 
 #include <QtCore>
 #include <QThread>
@@ -31,21 +28,20 @@ extern "C" {
 #include <QtMath>
 
 #include "AudioCache.h"
+#include "Sherpa_Helper.h"
 
 class Audio_Player: public QThread
 {
     Q_OBJECT
 
 public:
-    Audio_Player(QObject *parent,  QString filePath);
+    Audio_Player(QObject *parent,  QString _filePath,Sherpa_Helper *_sherpa_Helper);
 
     ~Audio_Player();
 
     void tryStart();
 
     void tryStop();
-
-
 
 protected:
     bool Open(char *filePath);
@@ -65,17 +61,15 @@ protected:
                               PaStreamCallbackFlags /*status_flags*/,
                               void *user_data);
 
-
+    Sherpa_Helper *sherpa_Helper = nullptr;
 
 private:
     //设备相关
-    //QAudioOutput *audioOutput = nullptr;
-    //QIODevice *ioDevice = nullptr;
-
 
     QString filePath;
     AudioCache   audioCache;
     PaStreamParameters outputParameters;
+
 
 private:
 

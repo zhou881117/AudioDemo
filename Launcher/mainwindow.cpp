@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include <QtCore>
@@ -36,13 +36,21 @@ void MainWindow::on_selectFileButton_clicked()
 
 void MainWindow::on_playButton_clicked()
 {
-    this->audio_Player = new Audio_Player(this,this->ui->lineEdit->text());
+    this->sherpa_Helper=new Sherpa_Helper(this);
+    this->audio_Player = new Audio_Player(this,this->ui->lineEdit->text(),this->sherpa_Helper);
+
     this->audio_Player->tryStart();
+    this->sherpa_Helper->tryStart();
+
     this->audio_Player->start();
+    this->sherpa_Helper->start();
 }
 
 void MainWindow::on_pauseButton_clicked()
 {
     this->audio_Player->tryStop();
     delete  this->audio_Player;
+
+    this->sherpa_Helper->tryStop();
+    delete  this->sherpa_Helper;
 }

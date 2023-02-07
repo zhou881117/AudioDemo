@@ -1,10 +1,9 @@
 ﻿#include "Audio_Player.h"
 
-Audio_Player::Audio_Player(QObject *parent, QString filePath): QThread(parent)
+Audio_Player::Audio_Player(QObject *parent,  QString _filePath,Sherpa_Helper *_sherpa_Helper): QThread(parent)
 {
-    this->filePath=filePath;
-
-    qDebug()<<sherpa_add(2,3);
+    this->filePath = _filePath;
+    this->sherpa_Helper = _sherpa_Helper;
 }
 
 Audio_Player::~Audio_Player()
@@ -15,6 +14,8 @@ Audio_Player::~Audio_Player()
 void Audio_Player::tryStart()
 {
     this->audioCache.isRunning = true;
+
+
 }
 
 void Audio_Player::tryStop()
@@ -79,6 +80,8 @@ int  Audio_Player::RecordCallback(const void *input_buffer, void  *output_buffer
     return audioCache->isRunning ? paContinue: paComplete;
 }
 
+
+
 void Audio_Player::run()
 {
 
@@ -122,7 +125,7 @@ void Audio_Player::run()
 
     //目的输出参数
     this->audioCache.channelCount = 1;
-    this->audioCache.sample_rate = outputDeviceInfo->defaultSampleRate;//32000;// outputDeviceInfo->defaultSampleRate;// 48000;//采样率最好和音频文件的一致
+    this->audioCache.sample_rate =  outputDeviceInfo->defaultSampleRate;//32000;// outputDeviceInfo->defaultSampleRate;// 48000;//采样率最好和音频文件的一致
     this->audioCache.sample_fmt = AVSampleFormat::AV_SAMPLE_FMT_FLT;//AV_SAMPLE_FMT_S16;//    AV_SAMPLE_FMT_FLT;
 
     qDebug()<<"sample_rate"<<this->audioCache.sample_rate;
@@ -133,8 +136,8 @@ void Audio_Player::run()
 
     outputParameters.device = outputDeviceIndex;
     outputParameters.channelCount = this->audioCache.channelCount;
-    outputParameters.sampleFormat = paFloat32;// paFloat32;
-    outputParameters.suggestedLatency =outputDeviceInfo->defaultLowOutputLatency;// outputDeviceInfo->defaultLowOutputLatency;
+    outputParameters.sampleFormat = paFloat32;// paInt16;// paFloat32;// paFloat32;
+    outputParameters.suggestedLatency = outputDeviceInfo->defaultLowOutputLatency;// outputDeviceInfo->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
     //打开音频文件
@@ -142,8 +145,6 @@ void Audio_Player::run()
 
     if(res)
     {
-
-
         int framesPerBuffer= this->pCodecCtx->frame_size;//this->pCodecCtx->frame_size;// av_samples_get_buffer_size(NULL, this->channelCount, this->pCodecCtx->frame_size, this->sample_fmt,0);
         qDebug()<< "framesPerBuffer"<< framesPerBuffer;
         if(framesPerBuffer<=0)
@@ -166,6 +167,7 @@ void Audio_Player::run()
 
         }
         int max_size = av_samples_get_buffer_size(NULL, this->audioCache.channelCount, 2048, this->audioCache.sample_fmt,0);
+
         while (this->audioCache.isRunning) {
             if(this->audioCache.writeIndex>=this->audioCache.readIndex)
             {
@@ -186,6 +188,7 @@ void Audio_Player::run()
                         int out_size  =  this->ReadData();
                         if(out_size>0)
                         {
+
                             if(this->audioCache.writeIndex + out_size <= AudioCache::bufferSize)
                             {
                                 memcpy(this->audioCache.buffer + this->audioCache.writeIndex,this->temp_buffer,out_size);
@@ -211,6 +214,7 @@ void Audio_Player::run()
                     int out_size  =  this->ReadData();
                     if(out_size>0)
                     {
+
                         memcpy(this->audioCache.buffer + this->audioCache.writeIndex,this->temp_buffer,out_size);
                         this->audioCache.writeIndex += out_size;
                     }
@@ -301,7 +305,7 @@ bool Audio_Player::Open(char *filePath)
     this->temp_buffer  = (unsigned char *)av_malloc(this->temp_buffer_size);
     //转码
     //Swr
-    //this->audio_convert_ctx = swr_alloc();
+    this->audio_convert_ctx = swr_alloc();
     this->audio_convert_ctx = swr_alloc_set_opts(this->audio_convert_ctx, av_get_default_channel_layout(this->audioCache.channelCount), this->audioCache.sample_fmt, this->audioCache.sample_rate,
                                                  av_get_default_channel_layout(pCodecCtx->channels), pCodecCtx->sample_fmt, pCodecCtx->sample_rate, NULL, NULL);
     swr_init(this->audio_convert_ctx);
@@ -379,6 +383,8 @@ int Audio_Player::ReadData()
                 return out_size;
             }
 
+            this->sherpa_Helper->putdata(pCodecCtx->channels,pCodecCtx->sample_fmt,pCodecCtx->sample_rate,pFrame->data,pFrame->nb_samples);
+
             int len = swr_convert(this->audio_convert_ctx, &this->temp_buffer, this->temp_buffer_size, (const uint8_t **)pFrame->data, pFrame->nb_samples);
 
 
@@ -391,7 +397,7 @@ int Audio_Player::ReadData()
     }
     else
     {
-        qDebug()<<444;
+        //qDebug()<<444;
     }
 
     return out_size;
