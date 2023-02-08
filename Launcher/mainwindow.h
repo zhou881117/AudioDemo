@@ -3,6 +3,10 @@
 
 #include <QMainWindow>
 
+#include <QtCore>
+#include <QScreen>
+#include <QApplication>
+
 #include "Audio_Player.h"
 
 QT_BEGIN_NAMESPACE
@@ -23,6 +27,10 @@ public slots:
         if(message.size()>0)
         {
             this->showNormal();
+            QScreen *screen = QGuiApplication::primaryScreen();
+            QSize screenSize = screen->size();
+            this->move((screenSize.width()-this->width()) / 2, (screenSize.height()-this->height()) / 2);
+            this->activateWindow();
         }
     }
 
