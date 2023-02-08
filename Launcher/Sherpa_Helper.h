@@ -41,6 +41,9 @@ public:
 
     void putdata(int channel_count,AVSampleFormat sample_fmt,int sample_rate,unsigned char* data[8],int nb_samples);//float sampling_rate,const float *waveform, int frames_per_buffer);
 
+signals:
+    void recognized(QString text,int segment);
+
 protected:
     //static void RecognizeCallback(const char * text, int size);
 

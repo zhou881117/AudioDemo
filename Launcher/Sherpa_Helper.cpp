@@ -120,11 +120,13 @@ void Sherpa_Helper::run()
                 QString tt = text.mid(last_text.size());
                 if(tt.size()>0)
                 {
+                    emit this->recognized(tt,segment_index);
                     qDebug()<<"append:"<<tt<<segment_index;
                 }
             }
             else
             {
+                emit this->recognized(text,segment_index);
                 qDebug()<<"first:"<<text<<segment_index;
             }
 

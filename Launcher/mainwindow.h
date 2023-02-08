@@ -24,7 +24,7 @@ public:
 public slots:
     void handleMessage(const QString& message)
     {
-        if(message.size()>0)
+        if(message.size() > 0)
         {
             this->showNormal();
             QScreen *screen = QGuiApplication::primaryScreen();
@@ -41,10 +41,14 @@ private slots:
 
     void on_pauseButton_clicked();
 
+    void on_recognize(QString text,int segment_index);
+
 private:
     Ui::MainWindow *ui;
 
     Audio_Player *audio_Player = nullptr;
     Sherpa_Helper *sherpa_Helper = nullptr;
+
+    int last_segment_index = 0;
 };
 #endif // MAINWINDOW_H
