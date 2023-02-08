@@ -16,8 +16,12 @@ extern "C" {
  #include "libswresample/swresample.h"
 }
 
-extern "C" {
-   #include "sherpa_ncnn_shell.h"
+//extern "C" {
+//   #include "sherpa_ncnn_shell.h"
+//}
+
+extern "C"{
+   #include "c-api.h"
 }
 
 #include <QtCore>
@@ -38,7 +42,7 @@ public:
     void putdata(int channel_count,AVSampleFormat sample_fmt,int sample_rate,unsigned char* data[8],int nb_samples);//float sampling_rate,const float *waveform, int frames_per_buffer);
 
 protected:
-    static void RecognizeCallback(const char * text, int size);
+    //static void RecognizeCallback(const char * text, int size);
 
     /*线程处理函数*/
     virtual void run() override;
@@ -46,9 +50,14 @@ protected:
 private:
     bool isRunning = false;
 
-    char *feature_extractor = nullptr;
+
     //转码相关
     struct SwrContext *audio_convert_ctx = nullptr;
+
+    //识别相关
+    SherpaNcnnModelConfig *model_config = nullptr;
+    SherpaNcnnDecoderConfig *decoder_config = nullptr;
+    SherpaNcnnRecognizer *ans = nullptr;
 
 
 

@@ -55,3 +55,8 @@ INCLUDEPATH += $$PWD/../3rdparty/sherpa/include
 DEPENDPATH += $$PWD/../3rdparty/sherpa/include
 
 include(../qtsingleapplication/src/qtsingleapplication.pri)
+
+win32: LIBS += -L$$PWD/../3rdparty/sherpa-ncnn-c-api/lib/ -lsherpa-ncnn-c-api
+
+INCLUDEPATH += $$PWD/../3rdparty/sherpa-ncnn-c-api/include
+DEPENDPATH += $$PWD/../3rdparty/sherpa-ncnn-c-api/include
