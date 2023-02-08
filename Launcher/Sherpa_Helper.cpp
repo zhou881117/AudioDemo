@@ -1,8 +1,6 @@
 ﻿#include "Sherpa_Helper.h"
 
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
+
 
 #include <cctype>  // std::tolower
 
@@ -28,13 +26,13 @@ void Sherpa_Helper::tryStart()
     this->isRunning = true;
 
     this->model_config = new SherpaNcnnModelConfig();
-    model_config->tokens = "D:/k2-fsa/sherpa-ncnn-2022-09-30/tokens.txt";
-    model_config->encoder_param = "D:/k2-fsa/sherpa-ncnn-2022-09-30/encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.param";
-    model_config->encoder_bin = "D:/k2-fsa/sherpa-ncnn-2022-09-30/encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin";
-    model_config->decoder_param = "D:/k2-fsa/sherpa-ncnn-2022-09-30/decoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.param";
-    model_config->decoder_bin = "D:/k2-fsa/sherpa-ncnn-2022-09-30/decoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin";
-    model_config->joiner_param = "D:/k2-fsa/sherpa-ncnn-2022-09-30/joiner_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.param";
-    model_config->joiner_bin = "D:/k2-fsa/sherpa-ncnn-2022-09-30/joiner_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin";
+    model_config->tokens = "tokens.txt";
+    model_config->encoder_param = "encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.param";
+    model_config->encoder_bin = "encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin";
+    model_config->decoder_param = "decoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.param";
+    model_config->decoder_bin = "decoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin";
+    model_config->joiner_param = "joiner_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.param";
+    model_config->joiner_bin = "joiner_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin";
     model_config->use_vulkan_compute = 0;
     model_config->num_threads = 4;
 
