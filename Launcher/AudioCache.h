@@ -16,7 +16,7 @@ public:
     bool isRunning = false;
     int readIndex = 0;
     int writeIndex = 0;
-    static const int bufferSize = 1024 * 500; //扩大缓存，有助于播放mp4的音频时，不卡顿
+    static const int bufferSize = 1024 * 200; //扩大缓存，有助于播放mp4的音频时，不卡顿
     char buffer[AudioCache::bufferSize];
 
     int channelCount = 1;

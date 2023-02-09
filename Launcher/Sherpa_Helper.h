@@ -16,10 +16,6 @@ extern "C" {
  #include "libswresample/swresample.h"
 }
 
-//extern "C" {
-//   #include "sherpa_ncnn_shell.h"
-//}
-
 extern "C"{
    #include "c-api.h"
 }

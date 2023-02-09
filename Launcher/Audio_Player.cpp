@@ -31,8 +31,8 @@ int  Audio_Player::RecordCallback(const void * /*input_buffer*/, void  *output_b
                                   const PaStreamCallbackTimeInfo */*time_info*/,
                                   PaStreamCallbackFlags /*status_flags*/,
                                   void *user_data) {
-    AudioCache *audioCache = reinterpret_cast<AudioCache *>(user_data);
 
+    AudioCache *audioCache = reinterpret_cast<AudioCache *>(user_data);
 
     //qDebug()<<"writeIndex"<<audioCache->writeIndex<<"readIndex"<<audioCache->readIndex;
     int  out_size = av_samples_get_buffer_size(NULL, audioCache->channelCount, frames_per_buffer, audioCache->sample_fmt,0);
