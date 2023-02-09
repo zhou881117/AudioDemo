@@ -21,7 +21,7 @@ void MainWindow::on_selectFileButton_clicked()
 {
     QString  srcDirPath = QFileDialog::getOpenFileName(
                 this,QStringLiteral("选择音频文件"),QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
-                "音频频文件(*.mp3 *.wav *.aac *.wma);;所有文件(*.*)");
+                "音频频文件(*.mp3 *.wav *.aac *.wma *.mp4);;所有文件(*.*)");
 
     if (srcDirPath.isEmpty())
     {

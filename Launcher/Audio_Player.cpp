@@ -26,16 +26,17 @@ void Audio_Player::tryStop()
 }
 
 
-int  Audio_Player::RecordCallback(const void *input_buffer, void  *output_buffer,
+int  Audio_Player::RecordCallback(const void * /*input_buffer*/, void  *output_buffer,
                                   unsigned long frames_per_buffer,  // NOLINT
-                                  const PaStreamCallbackTimeInfo * /*time_info*/,
+                                  const PaStreamCallbackTimeInfo */*time_info*/,
                                   PaStreamCallbackFlags /*status_flags*/,
                                   void *user_data) {
     AudioCache *audioCache = reinterpret_cast<AudioCache *>(user_data);
 
+
     //qDebug()<<"writeIndex"<<audioCache->writeIndex<<"readIndex"<<audioCache->readIndex;
     int  out_size = av_samples_get_buffer_size(NULL, audioCache->channelCount, frames_per_buffer, audioCache->sample_fmt,0);
-    //qDebug()<<"rr out_size"<<out_size;
+    //qDebug()<<"rr out_size"<<frames_per_buffer<<out_size;
     bool getData = false;
     if(audioCache->writeIndex > audioCache->readIndex)
     {
@@ -54,7 +55,7 @@ int  Audio_Player::RecordCallback(const void *input_buffer, void  *output_buffer
             {
                 memcpy(output_buffer,audioCache->buffer + audioCache->readIndex ,out_size);
                 audioCache->readIndex += out_size;
-                 getData=true;
+                getData=true;
             }
             else
             {
@@ -110,10 +111,10 @@ void Audio_Player::run()
     {
         const  PaDeviceInfo* paDeviceInfo = Pa_GetDeviceInfo(i);
         qDebug()<<"input count"<<paDeviceInfo->maxInputChannels
-                <<"output count"<<paDeviceInfo->maxOutputChannels
-                <<"hostApi"<<paDeviceInfo->hostApi
-                <<"apiType"<<Pa_GetHostApiInfo(paDeviceInfo->hostApi)->type
-                <<"name"<<paDeviceInfo->name<<endl;		//打印设备名
+               <<"output count"<<paDeviceInfo->maxOutputChannels
+              <<"hostApi"<<paDeviceInfo->hostApi
+             <<"apiType"<<Pa_GetHostApiInfo(paDeviceInfo->hostApi)->type
+            <<"name"<<paDeviceInfo->name<<endl;		//打印设备名
         if(outputDeviceIndex == -1 && paDeviceInfo->maxOutputChannels > 0)
         {
             outputDeviceIndex = i;
@@ -123,10 +124,11 @@ void Audio_Player::run()
         PaHostApiTypeId typeId = PaHostApiTypeId::paASIO;
     }
 
+    //av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO)
     //目的输出参数
-    this->audioCache.channelCount = 1;
+    this->audioCache.channelCount = 1;// av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
     this->audioCache.sample_rate =  outputDeviceInfo->defaultSampleRate;//32000;// outputDeviceInfo->defaultSampleRate;// 48000;//采样率最好和音频文件的一致
-    this->audioCache.sample_fmt = AVSampleFormat::AV_SAMPLE_FMT_FLT;//AV_SAMPLE_FMT_S16;//    AV_SAMPLE_FMT_FLT;
+    this->audioCache.sample_fmt = AVSampleFormat::AV_SAMPLE_FMT_FLT;//AV_SAMPLE_FMT_FLT;//AV_SAMPLE_FMT_S16;//    AV_SAMPLE_FMT_FLT;
 
     qDebug()<<"sample_rate"<<this->audioCache.sample_rate;
 
@@ -136,7 +138,7 @@ void Audio_Player::run()
 
     outputParameters.device = outputDeviceIndex;
     outputParameters.channelCount = this->audioCache.channelCount;
-    outputParameters.sampleFormat = paFloat32;// paInt16;// paFloat32;// paFloat32;
+    outputParameters.sampleFormat = paFloat32;// paFloat32;// paFloat32;// paInt16;// paFloat32;// paFloat32;
     outputParameters.suggestedLatency = outputDeviceInfo->defaultLowOutputLatency;// outputDeviceInfo->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
@@ -145,38 +147,25 @@ void Audio_Player::run()
 
     if(res)
     {
-        int framesPerBuffer= this->pCodecCtx->frame_size;//this->pCodecCtx->frame_size;// av_samples_get_buffer_size(NULL, this->channelCount, this->pCodecCtx->frame_size, this->sample_fmt,0);
-        qDebug()<< "framesPerBuffer"<< framesPerBuffer;
-        if(framesPerBuffer<=0)
-        {
-            framesPerBuffer = 1024;
-        }
+        int _frame_size = 0;
+        int framesPerBuffer = this->pCodecCtx->frame_size;//this->pCodecCtx->frame_size;// av_samples_get_buffer_size(NULL, this->channelCount, this->pCodecCtx->frame_size, this->sample_fmt,0);
 
-        //framesPerBuffer = 800;// 256;
+        int max_size = av_samples_get_buffer_size(NULL, this->audioCache.channelCount, 1024 * 8, this->audioCache.sample_fmt,0);
+
         //paFramesPerBufferUnspecified
         //paClipOff
         //paDitherOff有效降低播放噪音
         PaStream *out_stream = nullptr;
-        err = Pa_OpenStream(&out_stream,NULL, &outputParameters, this->audioCache.sample_rate , framesPerBuffer,paDitherOff , RecordCallback, &this->audioCache);
-        if (err != paNoError) {
-
-        }
-
-        err = Pa_StartStream(out_stream);
-        if (err != paNoError) {
-
-        }
-        int max_size = av_samples_get_buffer_size(NULL, this->audioCache.channelCount, 2048, this->audioCache.sample_fmt,0);
 
         while (this->audioCache.isRunning) {
             if(this->audioCache.writeIndex>=this->audioCache.readIndex)
             {
                 if(this->audioCache.writeIndex + max_size <= AudioCache::bufferSize)
                 {
-                    int out_size  =  this->ReadData();
-                    if(out_size>0)
+                    int out_size = this->ReadData(_frame_size);
+                    if(out_size > 0)
                     {
-                        memcpy(this->audioCache.buffer+this->audioCache.writeIndex,this->temp_buffer,out_size);
+                        memcpy(this->audioCache.buffer + this->audioCache.writeIndex,this->temp_buffer,out_size);
                         this->audioCache.writeIndex += out_size;
                     }
                 }
@@ -185,7 +174,7 @@ void Audio_Player::run()
                     int ll = this->audioCache.writeIndex + max_size - AudioCache::bufferSize;
                     if(ll <= this->audioCache.readIndex)
                     {
-                        int out_size  =  this->ReadData();
+                        int out_size  =  this->ReadData(_frame_size);
                         if(out_size>0)
                         {
 
@@ -209,15 +198,34 @@ void Audio_Player::run()
             else
             {
                 int ll = this->audioCache.readIndex - this->audioCache.writeIndex;
-                if(ll>=max_size)
+                if(ll >= max_size)
                 {
-                    int out_size  =  this->ReadData();
+
+                    int out_size = this->ReadData(_frame_size);
                     if(out_size>0)
                     {
 
                         memcpy(this->audioCache.buffer + this->audioCache.writeIndex,this->temp_buffer,out_size);
                         this->audioCache.writeIndex += out_size;
                     }
+                }
+            }
+
+            if(_frame_size>0 && framesPerBuffer <= 0)
+            {
+                framesPerBuffer = _frame_size;//有时只有读一帧数据之后才知道帧长
+            }
+            if(out_stream == nullptr)
+            {
+                qDebug()<< "framesPerBuffer"<< framesPerBuffer;
+                err = Pa_OpenStream(&out_stream, NULL, &outputParameters, this->audioCache.sample_rate, framesPerBuffer, paClipOff, RecordCallback, &this->audioCache);
+                if (err != paNoError) {
+
+                }
+
+                err = Pa_StartStream(out_stream);
+                if (err != paNoError) {
+
                 }
             }
 
@@ -294,7 +302,7 @@ bool Audio_Player::Open(char *filePath)
     PaError err = Pa_IsFormatSupported(NULL,&outputParameters,pCodecCtx->sample_rate);
     if( err == paFormatIsSupported )
     {
-       this->audioCache.sample_rate = pCodecCtx->sample_rate;
+        this->audioCache.sample_rate = pCodecCtx->sample_rate;
     }
 
     this->packet = av_packet_alloc();// (AVPacket *)av_malloc(sizeof(AVPacket));
@@ -353,7 +361,7 @@ void Audio_Player::Close()
 
 }
 
-int Audio_Player::ReadData()
+int Audio_Player::ReadData(int &frame_size)
 {
     int out_size = 0;
     if (av_read_frame(pFormatCtx, packet) >= 0)
@@ -383,6 +391,8 @@ int Audio_Player::ReadData()
                 return out_size;
             }
 
+            frame_size = pFrame->nb_samples;
+
             this->sherpa_Helper->putdata(pCodecCtx->channels,pCodecCtx->sample_fmt,pCodecCtx->sample_rate,pFrame->data,pFrame->nb_samples);
 
             int len = swr_convert(this->audio_convert_ctx, &this->temp_buffer, this->temp_buffer_size, (const uint8_t **)pFrame->data, pFrame->nb_samples);
@@ -390,7 +400,7 @@ int Audio_Player::ReadData()
 
             out_size = av_samples_get_buffer_size(NULL, this->audioCache.channelCount, len, this->audioCache.sample_fmt,0);
 
-            //qDebug()<< "swr_convert"<<len<<out_size;
+            //qDebug()<< "swr_convert"<<pFrame->nb_samples<<len<<out_size;
 
         }
         //av_packet_unref(packet);

@@ -48,7 +48,7 @@ protected:
 
     void Close();
 
-     int ReadData();
+     int ReadData(int &frame_size);
 
 protected:
     /*线程处理函数*/
