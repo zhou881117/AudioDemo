@@ -393,6 +393,7 @@ int Audio_Player::ReadData(int &frame_size)
 
             frame_size = pFrame->nb_samples;
 
+            //后续应该改为读取文件时写入缓存，播放时写入语音识别
             this->sherpa_Helper->putdata(pCodecCtx->channels,pCodecCtx->sample_fmt,pCodecCtx->sample_rate,pFrame->data,pFrame->nb_samples);
 
             int len = swr_convert(this->audio_convert_ctx, &this->temp_buffer, this->temp_buffer_size, (const uint8_t **)pFrame->data, pFrame->nb_samples);
