@@ -13,8 +13,10 @@
 
 1.  修改sherpa-ncnn/c-api/c-api.h
 
-    `
-  #if defined(__clang__)
+
+
+```
+#if defined(__clang__)
   #define DLL_EXPORT extern "C"
   #elif defined(__GNUC__) || defined(__GNUG__)
   #define DLL_EXPORT extern "C"
@@ -34,9 +36,8 @@ DLL_EXPORT SherpaNcnnRecognizer *CreateRecognizer(
 
 DLL_EXPORT void Decode(SherpaNcnnRecognizer *p);
 
-  #endif
-
-`
+```
+ 
 
     参考本仓库的3rdparty/sherpa-ncnn-c-api/include/c-api.h
 
