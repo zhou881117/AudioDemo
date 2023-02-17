@@ -13,7 +13,9 @@
 
 1.  修改sherpa-ncnn/c-api/c-api.h
 
+    参考本仓库的3rdparty/sherpa-ncnn-c-api/include/c-api.h
 
+    方便struct与method的导出
 
 ```
 #if defined(__clang__)
@@ -39,9 +41,7 @@ DLL_EXPORT void Decode(SherpaNcnnRecognizer *p);
 ```
  
 
-    参考本仓库的3rdparty/sherpa-ncnn-c-api/include/c-api.h
-
-    方便struct与method的导出
+   
      
 2.   qt的输出目录是DESTDIR = $$PWD/../bin
 
