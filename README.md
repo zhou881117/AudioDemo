@@ -16,6 +16,8 @@
     参考本仓库的3rdparty/sherpa-ncnn-c-api/include/c-api.h
 
     方便struct与method的导出
+    
+    然后使用build下生成的vs工程，编译输出 sherpa-ncnn-c-api.dll
 
 ```
   #if defined(__clang__)
