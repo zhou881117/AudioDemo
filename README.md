@@ -1,40 +1,34 @@
 # AudioDemo
 
 #### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+使用【k2-fsa、portaudio、ffmpeg、qt】进行实时语音识别 
 
 #### 软件架构
-软件架构说明
+1、使用k2-fsa的c-api实时识别
+2、使用portaudio时，使用无锁队列
+3、使用ffmpeg，注意文件采样率与播放采样率一致，注意帧长的获取
 
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  修改sherpa-ncnn/c-api/c-api.h
+    参考本仓库的3rdparty/sherpa-ncnn-c-api/include/c-api.h
+    方便struct与method的导出
+     
+2.   qt的输出目录是DESTDIR = $$PWD/../bin
+     所以把 3rdparty 目录下bin的文件copy到bin目录下
+     3rdparty\sherpa_models目录下的 encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin_1 encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin_2 使用run.bat  
+ 合并后再copy
+3.   也可以使用audio_demo_2023_2_10 这个release版本试用
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+![输入图片说明](%E7%A4%BA%E4%BE%8B.png)
 
 #### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
 
 
 #### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+
 
