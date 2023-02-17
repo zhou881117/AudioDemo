@@ -12,13 +12,18 @@
 #### 安装教程
 
 1.  修改sherpa-ncnn/c-api/c-api.h
+
     参考本仓库的3rdparty/sherpa-ncnn-c-api/include/c-api.h
+
     方便struct与method的导出
      
 2.   qt的输出目录是DESTDIR = $$PWD/../bin
+
      所以把 3rdparty 目录下bin的文件copy到bin目录下
+
      3rdparty\sherpa_models目录下的 encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin_1 encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin_2 使用run.bat  
  合并后再copy
+
 3.   也可以使用audio_demo_2023_2_10 这个release版本试用
 
 #### 使用说明
