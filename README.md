@@ -12,6 +12,14 @@
 #### 安装教程
 
 1.  修改sherpa-ncnn/c-api/c-api.h
+    `#if defined(__clang__)
+#define DLL_EXPORT extern "C"
+#elif defined(__GNUC__) || defined(__GNUG__)
+#define DLL_EXPORT extern "C"
+#elif defined(_MSC_VER)
+#define DLL_EXPORT extern "C" _declspec(dllexport)
+#endif
+`
 
     参考本仓库的3rdparty/sherpa-ncnn-c-api/include/c-api.h
 
@@ -21,7 +29,7 @@
 
      所以把 3rdparty 目录下bin的文件copy到bin目录下
 
-     3rdparty\sherpa_models目录下的 encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin_1 encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin_2 使用run.bat  
+     3rdparty\sherpa_models目录下的 encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin_1     encoder_jit_trace-v2-epoch-11-avg-2-pnnx.ncnn.bin_2 使用run.bat  
  合并后再copy
 
 3.   也可以使用audio_demo_2023_2_10 这个release版本试用
