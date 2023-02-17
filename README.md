@@ -41,6 +41,7 @@
 ```
  
 
+
    
      
 2.   qt的输出目录是DESTDIR = $$PWD/../bin
