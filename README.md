@@ -18,7 +18,7 @@
     方便struct与method的导出
 
 ```
-#if defined(__clang__)
+  #if defined(__clang__)
   #define DLL_EXPORT extern "C"
   #elif defined(__GNUC__) || defined(__GNUG__)
   #define DLL_EXPORT extern "C"
@@ -28,15 +28,15 @@
   ...
   DLL_EXPORT typedef struct SherpaNcnnModelConfig {
 
- ...
+  ...
 
-DLL_EXPORT SherpaNcnnRecognizer *CreateRecognizer(
+  DLL_EXPORT SherpaNcnnRecognizer *CreateRecognizer(
     const SherpaNcnnModelConfig *model_config,
     const SherpaNcnnDecoderConfig *decoder_config);
 
- ...
+  ...
 
-DLL_EXPORT void Decode(SherpaNcnnRecognizer *p);
+  DLL_EXPORT void Decode(SherpaNcnnRecognizer *p);
 
 ```
  
