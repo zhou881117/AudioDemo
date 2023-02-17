@@ -49,10 +49,6 @@ win32: LIBS += -L$$PWD/../3rdparty/ffmpeg3.4/lib/ -lswscale
 INCLUDEPATH += $$PWD/../3rdparty/ffmpeg3.4/include
 DEPENDPATH += $$PWD/../3rdparty/ffmpeg3.4/include
 
-win32: LIBS += -L$$PWD/../3rdparty/sherpa/lib/ -lsherpa-ncnn-shell
-
-INCLUDEPATH += $$PWD/../3rdparty/sherpa/include
-DEPENDPATH += $$PWD/../3rdparty/sherpa/include
 
 include(../qtsingleapplication/src/qtsingleapplication.pri)
 
