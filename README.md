@@ -12,13 +12,30 @@
 #### 安装教程
 
 1.  修改sherpa-ncnn/c-api/c-api.h
-    `#if defined(__clang__)
-#define DLL_EXPORT extern "C"
-#elif defined(__GNUC__) || defined(__GNUG__)
-#define DLL_EXPORT extern "C"
-#elif defined(_MSC_VER)
-#define DLL_EXPORT extern "C" _declspec(dllexport)
-#endif
+
+    `
+  #if defined(__clang__)
+  #define DLL_EXPORT extern "C"
+  #elif defined(__GNUC__) || defined(__GNUG__)
+  #define DLL_EXPORT extern "C"
+  #elif defined(_MSC_VER)
+  #define DLL_EXPORT extern "C" _declspec(dllexport)
+
+  ...
+  DLL_EXPORT typedef struct SherpaNcnnModelConfig {
+
+ ...
+
+DLL_EXPORT SherpaNcnnRecognizer *CreateRecognizer(
+    const SherpaNcnnModelConfig *model_config,
+    const SherpaNcnnDecoderConfig *decoder_config);
+
+ ...
+
+DLL_EXPORT void Decode(SherpaNcnnRecognizer *p);
+
+  #endif
+
 `
 
     参考本仓库的3rdparty/sherpa-ncnn-c-api/include/c-api.h
